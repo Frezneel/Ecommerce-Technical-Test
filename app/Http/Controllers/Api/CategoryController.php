@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Requests\Category\StoreCategoryRequest;
+use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Models\Category;
 
 class CategoryController extends Controller
@@ -36,14 +37,14 @@ class CategoryController extends Controller
         return response()->json($category, 201);
     }
 
-    public function update(StoreCategoryRequest $request, $id)
+    public function update(UpdateCategoryRequest $request, $id)
     {
+        $validate = $request->validated();
         $category = Category::where('is_deleted', false)->find($id);
         if (!$category) {
             return response()->json(['message' => 'Category not found'], 404);
         }
 
-        $validate = $request->validated();
         $category = $category->update($validate);
 
         // Hapus cache kategori agar data terbaru ditampilkan

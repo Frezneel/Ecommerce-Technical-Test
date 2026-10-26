@@ -10,7 +10,7 @@ class Role extends Model
     protected $fillable = [
         'name',
         'description',
-        'type_role_id',
+        'role_type_id',
         'is_deleted',
         'created_at',
         'updated_at',
@@ -27,11 +27,7 @@ class Role extends Model
 
     public function roleType()
     {
-        return $this->belongsTo(RoleType::class, 'type_role_id');
-    }
-
-    public function permissions(){
-        return $this->belongsToMany(Permission::class, 'role_permission', 'role_id', 'permission_id');
+        return $this->belongsTo(RoleType::class, 'role_type_id');
     }
 
     public function users(){

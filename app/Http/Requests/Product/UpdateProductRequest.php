@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Product;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateProductRequest extends FormRequest
 {
@@ -23,11 +24,12 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|required|string|max:255',
+            'name' => 'sometimes','required','string','max:255',
             'description' => ['sometimes','nullable', 'string', 'max:1000', new \App\Rules\BadWordCheck()],
             'price' => 'sometimes|required|numeric|min:1',
             'quantity' => 'sometimes|required|integer|min:1',
-            'category_id' => 'sometimes|required|exists:category,id',
+            'category' => 'sometimes|required|array',
+            'category.*' => ['sometimes', 'required','integer','exists:category,id','distinct'],
         ];
     }
 }

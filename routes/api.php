@@ -5,12 +5,16 @@ use Illuminate\Support\Facades\Route;
 //#1 Authentication menggunakan Santum
 Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->post('/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
 
 Route::group(['middleware' => ['auth:sanctum', 'ability:SYSTEM:VIEW_USERS']], function () {
-    Route::get('/users', [\App\Http\Controllers\Api\UserController::class, 'index']);
     Route::get('/users/{id}', [\App\Http\Controllers\Api\UserController::class, 'show']);
+    Route::put('/users/{id}', [\App\Http\Controllers\Api\UserController::class, 'update']);
+    Route::group(['middleware' => ['auth:sanctum', 'ability:SYSTEM:MANAGE_USERS']], function () {
+        Route::get('/users', [\App\Http\Controllers\Api\UserController::class, 'index']);
+        Route::delete('/users/{id}', [\App\Http\Controllers\Api\UserController::class, 'destroy']);
+    });
 });
-Route::middleware(['auth:sanctum', 'ability:SYSTEM:VIEW_USERS'])->post('/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
 
 #2
 Route::group(['middleware' => ['auth:sanctum', 'ability:SYSTEM:VIEW_PRODUCTS']], function () {

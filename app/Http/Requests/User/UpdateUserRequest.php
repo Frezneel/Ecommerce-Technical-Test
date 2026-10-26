@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\User;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class UpdateCategoryRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return $this->user()->tokenCan('SYSTEM:MANAGE_CATEGORIES');
+        return $this->user()->tokenCan('SYSTEM:MANAGE_USERS');
     }
 
     /**
@@ -22,11 +23,12 @@ class UpdateCategoryRequest extends FormRequest
      */
     public function rules(): array
     {
-        $categoryId = $this->route('id');
+        $id = $this->route('id');
+
         return [
-            'name' => 'sometimes','required','string','max:255',
-                Rule::unique('category', 'name')->ignore($categoryId),
-            'description' => 'sometimes|nullable|string|max:1000',
+            'name' => 'sometimes|required|string|max:255',
+            'email' => ['required','string','email','max:255',
+                Rule::unique('users', 'email')->ignore($id)],
         ];
     }
 }

@@ -93,17 +93,29 @@ class PermissionSeeder extends Seeder
 
         // Subscriber permissions
         \App\Models\Permission::create([
-            'code' => 'SUBSCRIBER:CARD_SILVER',
+            'code' => 'SUBSCRIBER:VIEW_CARD_SILVER_CONTENT',
+            'description' => 'Permission to get a discount on the silver card',
+        ]);
+        \App\Models\Permission::create([
+            'code' => 'SUBSCRIBER:MANAGE_CARD_SILVER_CONTENT',
             'description' => 'Permission to get a discount on the silver card',
         ]);
 
         \App\Models\Permission::create([
-            'code' => 'SUBSCRIBER:CARD_GOLD',
+            'code' => 'SUBSCRIBER:VIEW_CARD_GOLD_CONTENT',
+            'description' => 'Permission to get a discount on the gold card',
+        ]);
+        \App\Models\Permission::create([
+            'code' => 'SUBSCRIBER:MANAGE_CARD_GOLD_CONTENT',
             'description' => 'Permission to get a discount on the gold card',
         ]);
 
         \App\Models\Permission::create([
-            'code' => 'SUBSCRIBER:CARD_PLATINUM',
+            'code' => 'SUBSCRIBER:VIEW_CARD_PLATINUM_CONTENT',
+            'description' => 'Permission to get a discount on the platinum card',
+        ]);
+        \App\Models\Permission::create([
+            'code' => 'SUBSCRIBER:MANAGE_CARD_PLATINUM_CONTENT',
             'description' => 'Permission to get a discount on the platinum card',
         ]);
     }

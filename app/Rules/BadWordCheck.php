@@ -15,13 +15,13 @@ class BadWordCheck implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (stripos($value, 'bajakan') !== false) {
+        if (stripos(strtolower($value), 'bajakan') !== false) {
             $fail("Barang bajakan tidak boleh dijual di sistem ini.");
         }
-        if (stripos($value, 'palsu') !== false) {
+        if (stripos(strtolower($value), 'palsu') !== false) {
             $fail("Barang palsu tidak boleh dijual di sistem ini.");
         }
-        if (stripos($value, 'kw') !== false) {
+        if (stripos(strtolower($value), 'kw') !== false) {
             $fail("Barang kw tidak boleh dijual di sistem ini.");
         }
     }

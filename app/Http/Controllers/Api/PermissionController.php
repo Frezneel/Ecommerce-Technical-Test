@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Permission;
+use App\Http\Requests\Permission\StorePermissionRequest;
+use App\Http\Requests\Permission\UpdatePermissionRequest;
 
 class PermissionController extends Controller
 {
@@ -23,28 +25,20 @@ class PermissionController extends Controller
         return response()->json($permission);
     }
 
-    public function store(Request $request)
+    public function store(StorePermissionRequest $request)
     {
-        $request->validate([
-            'code' => 'required|string|max:255',
-            'description' => 'nullable|string|max:255',
-        ]);
-
+        $request->validated();
         $permission = Permission::create($request->all());
         return response()->json($permission, 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdatePermissionRequest $request, $id)
     {
+        $request->validated();
         $permission = Permission::where('is_deleted', false)->find($id);
         if (!$permission) {
             return response()->json(['message' => 'Permission not found'], 404);
         }
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'guard_name' => 'nullable|string|max:255',
-        ]);
 
         $permission->update($request->all());
         return response()->json($permission);

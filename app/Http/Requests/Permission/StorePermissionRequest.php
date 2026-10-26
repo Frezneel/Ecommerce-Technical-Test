@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Permission;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreCartRequest extends FormRequest
+class StorePermissionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return $this->user()->tokenCan('SYSTEM:MANAGE_CART');
+        return $this->user()->tokenCan('SYSTEM:MANAGE_PERMISSIONS');
     }
 
     /**
@@ -23,9 +23,8 @@ class StoreCartRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|exists:users,id',
-            'product_id' => 'required|exists:product,id',
-            'quantity' => 'required|integer|min:1',
+            'code' => 'required|string|max:255|unique:permission,code',
+            'description' => 'nullable|string|max:255',
         ];
     }
 }

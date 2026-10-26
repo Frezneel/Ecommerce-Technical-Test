@@ -4,63 +4,68 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Role;
+use App\Http\Requests\Role\StoreRoleRequest;
+use App\Http\Requests\Role\UpdateRoleRequest;
 
 class RoleController extends Controller
 {
     public function index()
     {
-        $roles = \App\Models\Role::where('is_deleted', false)->get();
+        $roles = Role::where('is_deleted', false)->get();
         return response()->json($roles);
     }
 
     public function show($id)
     {
-        $role = \App\Models\Role::where('is_deleted', false)->find($id);
+        $role = Role::where('is_deleted', false)
+                ->where('id', $id)
+                ->first();
         if (!$role) {
             return response()->json(['message' => 'Role not found'], 404);
         }
+        $role->load('roleType');
+        $role->load('permission');
         return response()->json($role);
     }
 
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'permissions' => 'nullable|array|exists:permissions,id',
-        ]);
+        $request->validated();
 
-        $role = \App\Models\Role::create($request->all());
-        if ($request->has('permissions')) {
-            $role->permissions()->attach($request->input('permissions'));
+        $role = Role::create($request->all());
+        if ($request->has('permission')) {
+            $role->permission()->attach($request->input('permission'));
         }
+        $role->load('roleType');
+        $role->load('permission');
 
         return response()->json($role, 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateRoleRequest $request, $id)
     {
-        $role = \App\Models\Role::where('is_deleted', false)->find($id);
-        
+        $request->validated();
+        $role = Role::where('is_deleted', false)->find($id);
+
         if (!$role) {
             return response()->json(['message' => 'Role not found'], 404);
         }
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
 
         $role->update($request->all());
-        if ($request->has('permissions')) {
-            $role->permissions()->sync($request->input('permissions'));
+        if ($request->has('permission')) {
+            $role->permission()->sync($request->input('permission'));
         }
+
+        $role->load('roleType');
+        $role->load('permission');
 
         return response()->json($role);
     }
 
     public function destroy($id)
     {
-        $role = \App\Models\Role::where('is_deleted', false)->find($id);
+        $role = Role::where('is_deleted', false)->find($id);
         if (!$role) {
             return response()->json(['message' => 'Role not found'], 404);
         }
