@@ -8,6 +8,10 @@ Project ini dibangun dan dijalankan menggunakan spesifikasi lingkungan berikut:
 | **Composer** | `2.10.3` | `composer -v` |
 
 ---
+### Jawaban Pertanyaan
+Pada Technical Test terdapat beberapa pertanyaan, untuk jawabannya berada di file berikut [Jawaban](QuestionAnswer.md)
+
+---
 
 ### AI Chat
 
