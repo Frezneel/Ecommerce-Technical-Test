@@ -55,7 +55,7 @@ class AuthController extends Controller
         //                 ->unique()
         //                 ->values()
         //                 ->toArray();
-        $user = User::where('email',$request->email)->first();
+        $user = User::with('role')->where('email',$request->email)->first();
         $permissions = DB::table('users')
             ->join('user_role', 'users.id', '=', 'user_role.user_id')
             ->join('role_permission', 'user_role.role_id', '=', 'role_permission.role_id')
@@ -63,7 +63,10 @@ class AuthController extends Controller
             ->where('users.email', $request->email)
             ->where('user_role.is_active', true)
             ->where('user_role.start_date', '<=', now())
-            ->where('user_role.end_date', '>=', now())
+            ->where(function ($query) {
+                $query->where('user_role.end_date', '>=', now())
+                      ->orWhereNull('user_role.end_date');
+            })
             ->select('permission.code')
             ->distinct()
             ->pluck('code')
@@ -71,11 +74,12 @@ class AuthController extends Controller
             ->toArray();
 
         $token = $user->createToken(('auth-token'), $permissions)->plainTextToken;
-        $data = UserResource::make($user);
 
         return response()->json([
-            'user' => $data,
-            'token' => $token,
+            'user' => UserResource::make($user),
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'permissions' => $permissions,
             'message' => 'User Logged In Successfully'
         ]);
 

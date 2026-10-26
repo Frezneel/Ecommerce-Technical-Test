@@ -50,6 +50,7 @@ class UserController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
         $user->update(['is_deleted' => true]);
+        $user->tokens()->delete();
         return response()->json(['message' => 'User deleted successfully']);
     }
 }

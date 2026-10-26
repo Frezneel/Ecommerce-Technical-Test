@@ -24,6 +24,7 @@ class UserResource extends JsonResource
                 ];
             }),
             'role' => $this->whenLoaded('role'),
+            'permissions' => $this->whenLoaded('permissions'),
         ];
     }
 }

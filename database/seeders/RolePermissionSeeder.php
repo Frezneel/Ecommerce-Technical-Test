@@ -40,23 +40,23 @@ class RolePermissionSeeder extends Seeder
             4, // SYSTEM:VIEW_PRODUCTS
             6, // SYSTEM:VIEW_CATEGORIES
             12, // SYSTEM:PLACE_ORDERS
-            16, // SYSTEM:MANAGE_CART
-            17, // SYSTEM:VIEW_CART
+            14, // SYSTEM:MANAGE_CART
+            13, // SYSTEM:VIEW_CART
         ]);
 
         // Role 4: Silver - has limited permissions
         \App\Models\Role::find(4)->permission()->attach([
-            13, // SUBSCRIPTION:VIEW_SILVER_CONTENT
+            15, // SUBSCRIPTION:VIEW_SILVER_CONTENT
         ]);
 
         // Role 5: Gold - has limited permissions
         \App\Models\Role::find(5)->permission()->attach([
-            14, // SUBSCRIPTION:VIEW_GOLD_CONTENT
+            17, // SUBSCRIPTION:VIEW_GOLD_CONTENT
         ]);
 
         // Role 6: Platinum - has limited permissions
         \App\Models\Role::find(6)->permission()->attach([
-            15, // SUBSCRIPTION:VIEW_PLATINUM_CONTENT
+            19, // SUBSCRIPTION:VIEW_PLATINUM_CONTENT
         ]);
     }
 }

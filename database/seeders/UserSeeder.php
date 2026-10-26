@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
             'password' => bcrypt('qwerty1234'),
         ])->role()->attach([
             1 => [
-                'start_date' => null,
+                'start_date' => now(),
                 'end_date' => null,
             ],
             6 =>[
@@ -35,7 +35,7 @@ class UserSeeder extends Seeder
         ])->each(function ($user) {
             $user->role()->attach([
                 2 => [
-                    'start_date' => null,
+                    'start_date' => now(),
                     'end_date' => null,
                 ],
                 4 => [
