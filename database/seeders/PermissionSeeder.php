@@ -80,6 +80,16 @@ class PermissionSeeder extends Seeder
             'description' => 'Permission to place orders',
         ]);
 
+        // Cart management permissions
+        \App\Models\Permission::create([
+            'code' => 'SYSTEM:MANAGE_CART',
+            'description' => 'Permission to manage cart',
+        ]);
+        \App\Models\Permission::create([
+            'code' => 'SYSTEM:VIEW_CART',
+            'description' => 'Permission to view cart',
+        ]);
+
 
         // Subscriber permissions
         \App\Models\Permission::create([

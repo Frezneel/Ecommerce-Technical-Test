@@ -1,58 +1,55 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
-
-## About Laravel
-
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+    
+1. Konsulasi mengenai best practice dan perbandingan arsitektur untuk sistem Role-Based Access Control(RBAC) menggunakan Middleware 'Sactum'
 ```
+    $user = User::with('role.permission')->where('email',$request->email)->first();
+    $permissions = $user->role
+        ->flatMap(fn($role) => $role->permission)
+        ->pluck('code')
+        ->map(fn($code) => strtoupper($code))
+        ->unique()
+        ->values()
+        ->toArray();
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+    $token = $user->createToken(('auth-token'), $permissions)->plainTextToken;
 
-## Contributing
+```
+*Alasan pakai ai* : 
+Mencari cara pengunaan 'Sactum' terhadap kebutuhan User Management yang dimana setiap User memiliki lebih dari satu role atau hanya memiliki satu role
+*Logika Penjelasan* : 
+Dari potongan kode tersebut dapat diketahui bahwa mengambil data dari tabel User dengan join ke tabel role dan permission dimana dari email request. Kemudian membuat deklarasi $permission kemudian mengambil data Permission dari user role, kemudian deklarasi flat map untuk menampung data dari relasi 'Permission'. kemudian pluck atau mengambil bagian kolom tabel 'code' saja pada flatMap tadi. Lanjut membuat isian permission code tadi menjadi uppercase, yang kemudian unique() ini untuk menghilangkan CODE Permission yang sama. Kemudian mengubah formatnya menjadi Array.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Contoh fungsi flatMap: 
+Sebelum: [[SYSTEM:PRODUCT_VIEW, SYSTEM:PRODUCT_EDIT], [SUBSCRIBE:SILVER, SUBSCRIBE:GOLD]]
+Setelah: [SYSTEM:PRODUCT_VIEW, SYSTEM:PRODUCT_EDIT, SUBSCRIBE:SILVER, SUBSCRIBE:GOLD]
 
-## Code of Conduct
+Kemudian $permission tersebut dimasukkan ke createToken sebagai Sactum Ability yang dimana fungsinya untuk memberikan permission pada fungsi" / endpoint.  
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. Mengganti query pengambilan Permission nomor 1 dari PHP Collection menjadi Query Builder untuk optimasi memory. 
 
-## Security Vulnerabilities
+```
+$permissions = DB::table('user')
+    ->join('role_user', 'user.id', '=', 'role_user.user_id')
+    ->join('role_permission', 'role_user.role_id', '=', 'role_permission.role_id')
+    ->join('permission', 'role_permission.permission_id', '=', 'permission.id')
+    ->where('user.email', $request->email)
+    ->select('permission.code')
+    ->distinct()
+    ->pluck('code') 
+    ->map(fn($code) => strtoupper($code))
+    ->toArray();
+```
+*Alasan pakai ai*: 
+Belum terbiasa menggunakan laravel, dan belum menemukan sturktur pengunaan database query. Kemudian untuk memastikan pengambilan data ke database yang potensi N+1.
+*Logika dan Carakerja*: 
+Menggunakan Query Builder pada tabel user dimana : 
+- Join tabel role_user berdasarkan data user.id = role_user.user_id
+- Join tabel role_permission berdasarkan kesamaan role_user.role_id dengan role_permission.role_id. 
+- Join tabel permission berdasarkan kesamaan permission_role.permission_id dengan permission.id
+- Mencari data berdasarkan email user request yang sudah tervalidasi auth.
+- Select / mengambil kolom 'code' pada tabel permission
+- distinct() fungsi ini lebih di database untuk tidak menampilkan data yang sama (unique).
+- pluck('code') menghubah hasi query menjadi 1 dimensi
+- toArray() => merubah data menjadi array
+Menggunakan kode tersebut dikarenakan User::with() PHP collection ini lumayan menguras memori dikarenakan datanya dialokasikan ke model dimana model disimpan di memori. 
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

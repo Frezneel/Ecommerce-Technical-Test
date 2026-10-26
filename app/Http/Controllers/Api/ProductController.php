@@ -7,12 +7,16 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Http\Resources\ProductResource;
 use App\Http\Requests\StoreProductRequest;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::all()->where('is_deleted', false);
+        // Cache data produk selama 5 menit
+        $products = Cache::remember('product_list_all', 60*5, function () {
+            return Product::with('category')->where('is_deleted', false)->get()->toArray();
+        });
         return response()->json($products);
     }
 
@@ -36,22 +40,28 @@ class ProductController extends Controller
             $product->category()->attach($request->input('category_id'));
         }
 
+        // Hapus cache produk agar data terbaru ditampilkan
+        cache()->forget('product_list_all');
+
         return response()->json([
             "message" => "Product created successfully",
             "product" => $product
         ], 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(StoreProductRequest $request, $id)
     {
         $product = Product::where('is_deleted', false)->find($id);
         if (!$product) {
             return response()->json(['message' => 'Product not found'], 404);
         }
-        $product->update($request->all());
+        $validate = $request->validated();
+        $product = $product->update($validate);
         if ($request->has('category_id')) {
             $product->category()->sync($request->input('category_id'));
         }
+        // Hapus cache produk agar data terbaru ditampilkan
+        cache()->forget('product_list_all');
 
         return response()->json($product);
     }
@@ -65,6 +75,11 @@ class ProductController extends Controller
 
         $product->update(['is_deleted' => true, 'deleted_at' => now()]);
 
+        // Hapus cache produk agar data terbaru ditampilkan
+        cache()->forget('product_list_all');
+
         return response()->json(['message' => 'Product deleted successfully']);
     }
+
+
 }

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Permission;
+use Illuminate\Support\Facades\DB;
+use App\Http\Resources\UserResource;
 
 class AuthController extends Controller
 {
@@ -44,21 +46,33 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user = User::with('role.permission')->where('email',$request->email)->first();
-        $permissions = $user->role
-                        ->flatMap(fn($role) => $role->permission)
-                        ->pluck('code')
-                        ->map(fn($code) => strtoupper($code))
-                        ->unique()
-                        ->values()
-                        ->toArray();
+        //EAGER = Memakan Ram karena perlu memuat semua data relasi,
+        //LAZY = Hanya memuat data relasi ketika dibutuhkan
+        // $user = User::with('role.permission')->where('email',$request->email)->first();
+        // $permissions = $user->role
+        //                 ->flatMap(fn($role) => $role->permission)
+        //                 ->pluck('code')
+        //                 ->map(fn($code) => strtoupper($code))
+        //                 ->unique()
+        //                 ->values()
+        //                 ->toArray();
+        $user = User::where('email',$request->email)->first();
+        $permissions = DB::table('users')
+            ->join('user_role', 'users.id', '=', 'user_role.user_id')
+            ->join('role_permission', 'user_role.role_id', '=', 'role_permission.role_id')
+            ->join('permission', 'role_permission.permission_id', '=', 'permission.id')
+            ->where('users.email', $request->email)
+            ->select('permission.code')
+            ->distinct()
+            ->pluck('code')
+            ->map(fn($code) => strtoupper($code))
+            ->toArray();
 
         $token = $user->createToken(('auth-token'), $permissions)->plainTextToken;
+        $data = UserResource::make($user);
 
         return response()->json([
-            'user' => $user->only('id', 'name', 'email'),
-            'permissions' => $permissions,
-            'role' => $user->role->pluck('name'),
+            'user' => $data,
             'token' => $token,
             'message' => 'User Logged In Successfully'
         ]);

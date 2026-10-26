@@ -1,16 +1,14 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 //#1 Authentication menggunakan Santum
 Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
 
-Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::get('/users', function (Request $request) {
-        return $request->user();
-    })->middleware('auth:sanctum','ability:SYSTEM:VIEW_USERS');
+Route::group(['middleware' => ['auth:sanctum', 'ability:SYSTEM:VIEW_USERS']], function () {
+    Route::get('/users', [\App\Http\Controllers\Api\UserController::class, 'index']);
+    Route::get('/users/{id}', [\App\Http\Controllers\Api\UserController::class, 'show']);
 });
 Route::middleware(['auth:sanctum', 'ability:SYSTEM:VIEW_USERS'])->post('/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
 
@@ -56,5 +54,16 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:SYSTEM:VIEW_ROLES']], fu
         Route::post('/roles', [\App\Http\Controllers\Api\RoleController::class, 'store']);
         Route::put('/roles/{id}', [\App\Http\Controllers\Api\RoleController::class, 'update']);
         Route::delete('/roles/{id}', [\App\Http\Controllers\Api\RoleController::class, 'destroy']);
+    });
+});
+
+//Cart Routes
+Route::group(['middleware' => ['auth:sanctum', 'ability:SYSTEM:VIEW_CART']], function () {
+    Route::get('/carts', [\App\Http\Controllers\Api\CartController::class, 'index']);
+    Route::get('/carts/{id}', [\App\Http\Controllers\Api\CartController::class, 'show']);
+    Route::group(['middleware' => ['auth:sanctum', 'ability:SYSTEM:MANAGE_CART']], function () {
+        Route::post('/carts', [\App\Http\Controllers\Api\CartController::class, 'store']);
+        Route::put('/carts/{id}', [\App\Http\Controllers\Api\CartController::class, 'update']);
+        Route::delete('/carts/{id}', [\App\Http\Controllers\Api\CartController::class, 'destroy']);
     });
 });

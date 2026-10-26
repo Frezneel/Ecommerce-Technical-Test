@@ -21,6 +21,7 @@ class Permission extends Model
         'updated_at',
         'is_deleted',
         'deleted_at',
+        'pivot',
     ];
 
     public function roles()

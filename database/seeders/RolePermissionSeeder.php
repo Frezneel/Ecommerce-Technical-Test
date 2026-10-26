@@ -27,6 +27,11 @@ class RolePermissionSeeder extends Seeder
             10, // SYSTEM:VIEW_PERMISSIONS
             11, // SYSTEM:MANAGE_ORDERS
             12, // SYSTEM:PLACE_ORDERS
+            13, // SUBSCRIPTION:VIEW_SILVER_CONTENT
+            14, // SUBSCRIPTION:VIEW_GOLD_CONTENT
+            15, // SUBSCRIPTION:VIEW_PLATINUM_CONTENT
+            16, // SYSTEM:MANAGE_CART
+            17, // SYSTEM:VIEW_CART
         ]);
 
         // Role 2: User - has limited permissions
