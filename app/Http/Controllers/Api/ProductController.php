@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Http\Resources\ProductResource;
 use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
@@ -49,7 +50,7 @@ class ProductController extends Controller
         ], 201);
     }
 
-    public function update(StoreProductRequest $request, $id)
+    public function update(UpdateProductRequest $request, $id)
     {
         $product = Product::where('is_deleted', false)->find($id);
         if (!$product) {

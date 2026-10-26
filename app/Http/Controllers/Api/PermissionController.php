@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\models\Permission;
+use App\Models\Permission;
 
 class PermissionController extends Controller
 {
     public function index()
     {
-        $permissions = Permission::where('is_deleted', false)->all();
+        $permissions = Permission::where('is_deleted', false)->get();
         return response()->json($permissions);
     }
 
@@ -26,8 +26,8 @@ class PermissionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'guard_name' => 'nullable|string|max:255',
+            'code' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
         ]);
 
         $permission = Permission::create($request->all());

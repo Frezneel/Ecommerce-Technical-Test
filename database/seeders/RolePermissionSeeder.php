@@ -40,6 +40,8 @@ class RolePermissionSeeder extends Seeder
             4, // SYSTEM:VIEW_PRODUCTS
             6, // SYSTEM:VIEW_CATEGORIES
             12, // SYSTEM:PLACE_ORDERS
+            16, // SYSTEM:MANAGE_CART
+            17, // SYSTEM:VIEW_CART
         ]);
 
         // Role 4: Silver - has limited permissions
