@@ -1,4 +1,16 @@
-    
+### Spesifikasi Development
+
+Project ini dibangun dan dijalankan menggunakan spesifikasi lingkungan berikut:
+
+| Komponen | Versi | Perintah Cek Versi |
+| :--- | :--- | :--- |
+| **PHP** | `8.5.12` | `php -v` |
+| **Composer** | `2.10.3` | `composer -v` |
+
+---
+
+### AI Chat
+
 1. Konsulasi mengenai best practice dan perbandingan arsitektur untuk sistem Role-Based Access Control(RBAC) menggunakan Middleware 'Sactum'
 ```
     $user = User::with('role.permission')->where('email',$request->email)->first();
